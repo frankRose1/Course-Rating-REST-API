@@ -1,4 +1,3 @@
-
 //container for error handlers
 const errorHandlers = {};
 
