@@ -3,6 +3,7 @@
 // load modules
 const express = require('express');
 const morgan = require('morgan');
+const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const router = require('./routes');
 const errorHandlers = require('./handlers/errorHandlers');
@@ -26,8 +27,9 @@ db.once("open", () => {
 // set the port
 app.set('port', port);
 
-// morgan for http request logging
 app.use(morgan('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded( {extended: true} ));
 
 // send a friendly greeting for the root route
 app.get('/', (req, res) => {
