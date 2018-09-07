@@ -38,8 +38,8 @@ userHandlers.createUser = (req, res, next) => {
                 if (err) {
                     return next(err);
                 } else {
-                    res.loaction("/");
-                    res.status(201);
+                    res.location("/");
+                    res.sendStatus(201);
                 }
             });
     } else {
