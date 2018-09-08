@@ -34,15 +34,28 @@ courseHandler.getCourseById = (req, res, next) => {
 };
 
 //POST /api/courses 201 - Creates a course, sets the Location header, and returns no content
-    //when a course is created, a reference to the user must be saved also
-    // can set a propery on the --> req.body.user = req.user._id;
-                                                    //req.user is the currently logged in user
-    // How do we get a currently logged in user?
+//Auth is required to create a course
+//TODO: Check for required fields
+    //estimatedTIme and materialsNeeded is optional
 courseHandler.createCourse = (req, res, next) => {
-    // req.body.user = req.user._id
-    // Course.create(req.body)
-    res.location("/");
-    res.sendStatus(201);
+    //create reference to the user's ID who created the course on req.body
+    req.body.user = req.user._id;
+    const {title, user, description, steps} = req.body;
+
+    if (title && user && description && steps) {
+        Course.create(req.body, (err, course) => {
+            if (err) {
+                return next(err);
+            }
+            
+            res.location("/");
+            res.sendStatus(201);
+        });
+    } else {
+        const error = new Error("Required fields are missing.");
+        error.status = 400;
+        next(error);
+    }
 };
 
 module.exports = courseHandler;

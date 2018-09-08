@@ -3,7 +3,7 @@ const User = mongoose.model('User');
 
 const userHandlers = {};
 
-// GET /api/users 200 - Returns the currently authenticated user, (LOGIN)
+// GET /api/users 200 - Returns the currently authenticated user
 userHandlers.getUser = (req, res, next) => {
     //custom auth middleware will add the "user" propery to req
     const id = req.user._id;

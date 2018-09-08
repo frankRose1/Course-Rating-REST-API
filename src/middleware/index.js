@@ -13,7 +13,7 @@ const middleware = {};
 middleware.auth = (req, res, next) => {
     //parse the headers
     const credentials = auth(req);
-        // ==> { name: "A Name", pass: "whatever"} || undefined if aut headers are invalid
+        // ==> { name: "A Name", pass: "whatever"} || undefined if auth headers are invalid
 
     if (!credentials) {
         const error = new Error("Invalid or missing authorization headers.");

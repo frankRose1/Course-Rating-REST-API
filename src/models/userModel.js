@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const validator = require('validator');
 const bcrypt = require('bcrypt');
-//Email must be proper format
-//Numbers have min and max validators
+
+
 const UserSchema = new Schema({
     fullName: {
         type: String,
@@ -26,9 +26,9 @@ const UserSchema = new Schema({
 
 /**
  * Authenticate a user using bcrypt
- * @param {string} email - provided by the user in req.body
- * @param {string} password - provided by the user in req.body
- * @param {function} callback - return an error and/or a user if authentication is successfull
+ * @param {string} email - provided by the user in req.body or in Auth Headers
+ * @param {string} password - provided by the user in req.body or in Auth Headers
+ * @param {function} callback - return an error and/or a user
  */
 UserSchema.statics.authenticate = function(email, password, callback){
     this.findOne({emailAddress: email})
@@ -41,7 +41,7 @@ UserSchema.statics.authenticate = function(email, password, callback){
                 error.status = 404;
                 callback(error);
             }
-            
+
             //if a user was found compare the password provided with the hashed password in the db
             bcrypt.compare(password, user.password, function(err, res){
                 if (res) {
