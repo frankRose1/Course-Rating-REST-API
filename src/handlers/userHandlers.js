@@ -1,4 +1,5 @@
-const User = require('../models/userModel');
+const mongoose = require('mongoose');
+const User = mongoose.model('User');
 
 const userHandlers = {};
 

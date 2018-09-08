@@ -1,4 +1,5 @@
-const Course = require('../models/courseModel');
+const mongoose = require('mongoose');
+const Course = mongoose.model('Course');
 
 const courseHandler = {};
 
@@ -20,7 +21,17 @@ courseHandler.getCourses = (req, res, next) => {
 //When returning a single course for the GET /api/courses/:courseId route, use Mongoose population to load the related user and reviews documents.
 courseHandler.getCourseById = (req, res, next) => {
     const {courseId} = req.params;
-    res.sendStatus(200);
+    Course.findById(courseId)
+            .populate('user')
+            .populate('reviews')
+            .exec((err, course) => {
+                if (err) {
+                    return next(err);
+                }
+                
+                res.status(200);
+                res.json(course);
+            });
 };
 
 module.exports = courseHandler;
