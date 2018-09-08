@@ -31,7 +31,7 @@ const UserSchema = new Schema({
  * @param {function} callback - return an error and/or a user if authentication is successfull
  */
 UserSchema.statics.authenticate = function(email, password, callback){
-    User.findOne({emailAddress: email})
+    this.findOne({emailAddress: email})
         .exec(function(err ,user){
             if (err) {
                 callback(err);
@@ -41,6 +41,7 @@ UserSchema.statics.authenticate = function(email, password, callback){
                 error.status = 404;
                 callback(error);
             }
+            console.log(user);
             //if a user was found compare the password provided with the hashed password in the db
             bcrypt.compare(password, user.password, function(err, res){
                 if (res) {

@@ -2,11 +2,12 @@ const express = require('express');
 const router = express.Router();
 const userHandlers = require('../handlers/userHandlers');
 const courseHandlers = require('../handlers/courseHandlers');
+const middleware = require('../middleware');
 
 //all routes are prepended with "/api"
 
 //user routes
-router.get('/users', userHandlers.getUser);
+router.get('/users', middleware.auth, userHandlers.getUser);
 router.post('/users', userHandlers.createUser);
 
 //course routes

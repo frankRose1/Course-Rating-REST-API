@@ -5,6 +5,7 @@ const userHandlers = {};
 
 // GET /api/users 200 - Returns the currently authenticated user, (LOGIN)
 userHandlers.getUser = (req, res, next) => {
+    console.log("usersHandler", req.user);
     User.find({})
         .exec((err, users) => {
             if (err) {
