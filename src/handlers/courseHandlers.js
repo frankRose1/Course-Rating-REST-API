@@ -34,9 +34,7 @@ courseHandler.getCourseById = (req, res, next) => {
 };
 
 //POST /api/courses 201 - Creates a course, sets the Location header, and returns no content
-//Auth is required to create a course
-//TODO: Check for required fields
-    //estimatedTIme and materialsNeeded is optional
+    //Required --> title, description, steps, auth headers
 courseHandler.createCourse = (req, res, next) => {
     //create reference to the user's ID who created the course on req.body
     req.body.user = req.user._id;
@@ -57,5 +55,44 @@ courseHandler.createCourse = (req, res, next) => {
         next(error);
     }
 };
+
+// PUT /api/courses/:courseId 204 - Updates a course and returns no content
+    //Required --> auth headers && atleast one of the fields on the schema to be updated
+courseHandler.updateCourse = (req, res, next) => {
+    const userId = req.user._id;
+    const {courseId} = req.params;
+    const {title, steps, description} = req.body;
+    if (title || steps || description || estimatedTime || materialsNeeded) {
+        Course.findById(courseId)
+        .exec( (err, course) => {
+            if (err) {
+                return next(err);
+            }
+
+            //only the owner of a course can edit the course
+            if (!course.user.equals(userId)) {
+                const error = new Error('Only the owner of a course can make edits.');
+                error.status = 401;
+                return next(error);
+            }
+
+            //update the course
+            course.update(req.body, (err) => {
+                if (err) {
+                    return next(err);
+                }
+
+                res.sendStatus(204);
+            });
+        });
+    } else {
+        const error = new Error('Please provide atleast one field to be updated.');
+        error.status = 400;
+        next(error);
+    }
+};
+
+
+
 
 module.exports = courseHandler;

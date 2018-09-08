@@ -14,5 +14,6 @@ router.post('/users', userHandlers.createUser);
 router.get('/courses', courseHandlers.getCourses);
 router.get('/courses/:courseId', courseHandlers.getCourseById);
 router.post('/courses', middleware.auth, courseHandlers.createCourse);
+router.put('/courses/:courseId', middleware.auth, courseHandlers.updateCourse);
 
 module.exports = router;
