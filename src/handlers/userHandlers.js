@@ -5,14 +5,17 @@ const userHandlers = {};
 
 // GET /api/users 200 - Returns the currently authenticated user, (LOGIN)
 userHandlers.getUser = (req, res, next) => {
-    console.log("usersHandler", req.user);
-    User.find({})
-        .exec((err, users) => {
+    //custom auth middleware will add the "user" propery to req
+    const id = req.user._id;
+
+    User.findById(id)
+        .exec((err, user) => {
             if (err) {
                 return next(err);
             }
     
-            res.status(200).json(users);
+            res.status(200)
+            res.json(user);
         });
 };
 
@@ -50,5 +53,6 @@ userHandlers.createUser = (req, res, next) => {
         return next(error);
     }
 };
+
 
 module.exports = userHandlers;

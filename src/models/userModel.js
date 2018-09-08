@@ -41,7 +41,7 @@ UserSchema.statics.authenticate = function(email, password, callback){
                 error.status = 404;
                 callback(error);
             }
-            console.log(user);
+            
             //if a user was found compare the password provided with the hashed password in the db
             bcrypt.compare(password, user.password, function(err, res){
                 if (res) {

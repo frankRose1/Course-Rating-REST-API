@@ -27,7 +27,6 @@ middleware.auth = (req, res, next) => {
             if (err) {
                 return next(err);
             }
-            console.log(user);
             //add the user to the request to be available in next middleware
             req.user = user;
             next();
