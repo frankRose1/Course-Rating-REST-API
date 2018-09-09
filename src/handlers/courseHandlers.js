@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Course = mongoose.model('Course');
+const Review = mongoose.model('Review');
 
 const courseHandler = {};
 
@@ -92,6 +93,41 @@ courseHandler.updateCourse = (req, res, next) => {
     }
 };
 
+//POST /api/courses/:courseId/reviews 201 - Creates a review for the specified course ID, sets the Location header to the related course, and returns no content
+// Required --> auth and rating
+courseHandler.createReview = (req, res, next) => {
+    //add a reference to the logged in user leaving the review
+    req.body.user = req.user._id;
+    const {courseId} = req.params;
+    const {rating} = req.body;
+
+    if (rating && typeof(rating) == 'number') {
+        //see if the course exits first
+        Course.findById(courseId)
+                .exec((err, course) => {
+                    if (err) return next(err);
+
+                    //create the review
+                    Review.create(req.body, (err, review) => {
+                        if (err)  return next(err);
+                        //update the reviews array on the course model
+                        course.reviews.push(review._id);
+                        course.save((err, course) => {
+                            if (err) return next(err);
+
+                            res.location(`/api/courses/${courseId}`);
+                            res.sendStatus(201);
+                        });
+                    });
+
+                });
+        
+    } else {
+        const error = new Error('Please leave a rating.');
+        error.status = 400;
+        next(error);
+    }
+};
 
 
 
