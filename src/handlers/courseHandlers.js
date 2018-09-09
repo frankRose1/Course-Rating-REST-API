@@ -130,5 +130,4 @@ courseHandler.createReview = (req, res, next) => {
 };
 
 
-
 module.exports = courseHandler;
