@@ -22,8 +22,6 @@ courseHandler.getCourses = (req, res, next) => {
 courseHandler.getCourseById = (req, res, next) => {
     const {courseId} = req.params;
     Course.findById(courseId)
-            .populate('user')
-            .populate('reviews')
             .exec((err, course) => {
                 if (err) {
                     return next(err);
