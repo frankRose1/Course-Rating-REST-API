@@ -60,12 +60,16 @@ courseHandler.createCourse = (req, res, next) => {
 courseHandler.updateCourse = (req, res, next) => {
     const userId = req.user._id;
     const {courseId} = req.params;
-    const {title, steps, description} = req.body;
+    const {title, steps, description, estimatedTime, materialsNeeded} = req.body;
     if (title || steps || description || estimatedTime || materialsNeeded) {
         Course.findById(courseId)
         .exec( (err, course) => {
-            if (err) {
-                return next(err);
+            if (err) return next(err);
+
+            if (!course) {
+                const error = new Error('Could not find a course with that ID.');
+                error.status = 404;
+                return next(error);
             }
 
             //only the owner of a course can edit the course
@@ -76,10 +80,8 @@ courseHandler.updateCourse = (req, res, next) => {
             }
 
             //update the course
-            course.update(req.body, (err) => {
-                if (err) {
-                    return next(err);
-                }
+            course.update(req.body, (err, doc) => {
+                if (err) return next(err); 
 
                 res.sendStatus(204);
             });
@@ -107,7 +109,14 @@ courseHandler.createReview = (req, res, next) => {
 
                     //create the review
                     Review.create(req.body, (err, review) => {
-                        if (err)  return next(err);
+                        if (err)  {
+                            if (err.name == 'ValidationError') {
+                                const error = new Error(err.message);
+                                error.status = 400;
+                                return next (error);
+                            }
+                            return next(err);
+                        };
                         //update the reviews array on the course model
                         course.reviews.push(review._id);
                         course.save((err, course) => {

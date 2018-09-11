@@ -22,10 +22,7 @@ userHandlers.getUser = (req, res, next) => {
 // POST /api/users 201 - Creates a user, sets the Location header to "/", and returns no content (SIGNUP)
 userHandlers.createUser = (req, res, next) => {
     const {fullName, emailAddress, password, confirmPassword} = req.body;
-    if (fullName &&
-        emailAddress &&
-        password &&
-        confirmPassword) {
+    if (fullName && emailAddress && password && confirmPassword) {
             //match the passwords
             if (password !== confirmPassword) {
                 const error = new Error("Passwords must match.");
@@ -41,6 +38,15 @@ userHandlers.createUser = (req, res, next) => {
 
             User.create(userData, (err, user) => {
                 if (err) {
+                    if (err.code == 11000) {
+                        const error = new Error('A user with that email already exists!');
+                        error.status = 400;
+                        return next(error);
+                    } else if (err.name == 'ValidationError') {
+                        const error = new Error('Please provide a valid email address.');
+                        error.status = 400;
+                        return next(error);
+                    }
                     return next(err);
                 } else {
                     res.location("/");
@@ -48,7 +54,7 @@ userHandlers.createUser = (req, res, next) => {
                 }
             });
     } else {
-        const error = new Error("All fields are required");
+        const error = new Error("Please fill out the required fields.");
         error.status = 400;
         return next(error);
     }

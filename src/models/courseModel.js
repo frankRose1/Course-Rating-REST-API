@@ -63,7 +63,7 @@ CourseSchema.statics.checkCourseOwner = function(courseId, userId, callback){
             }
 
             //compare the user's id on the request to the user who owns this course
-            if (course.user.equals(userId)) {
+            if (course.user._id.equals(userId)) {
                 //if they match, callback an error
                 const error = new Error('You can\'t post a review on your own course!');
                 error.status = 403;
@@ -73,6 +73,12 @@ CourseSchema.statics.checkCourseOwner = function(courseId, userId, callback){
             }
         });
 };
+
+CourseSchema.method("update", function(updates, callback){
+    Object.assign(this, updates);
+
+    this.save(callback);
+});
 
 //Auto populate the reviews and course owner each time a query is made for a specific course
 //Use deep population to return only the users fullname and ID on the related course and on the individual reviews
