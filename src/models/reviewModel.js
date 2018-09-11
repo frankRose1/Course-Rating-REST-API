@@ -19,7 +19,6 @@ const ReviewSchema = new Schema({
     },
     review: {
         type: String,
-        required: [true, "Please leave a review."],
         trim: true
     }
 });
