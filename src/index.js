@@ -60,4 +60,5 @@ const server = app.listen(app.get('port'), () => {
   console.log(`Express server is listening on port ${server.address().port}`);
 });
 
+//export to be tested
 module.exports = server;

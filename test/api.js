@@ -2,10 +2,13 @@ const server = require('../src/index');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const {expect} = chai;
-const should = chai.should();
 
 chai.use(chaiHttp);
 
+/**
+ * You may want to comment out the console.error(err.stack) in "src/handlers/errorHandlers.js" 
+ *  it clutters up the console when testing
+ */
 
 describe('API Endpoints', function(){
     this.timeout(4000); //taking a while to connect to the DB
