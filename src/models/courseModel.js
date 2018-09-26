@@ -47,7 +47,7 @@ const CourseSchema = new Schema({
 /**
  * Used in middleware to prevent a course owner from reviewing their own course
  * @param {string} courseId - course ID from the req.params
- * @param {string} userId - an authenticated user will be available on the request (req.user) from previous middleware
+ * @param {string} userId - an authenticated user will be available on the request (req.session.userId) from sessions
  * @param {function} callback - callback the results 
  */
 CourseSchema.statics.checkCourseOwner = function(courseId, userId, callback){

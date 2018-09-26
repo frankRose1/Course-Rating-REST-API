@@ -36,7 +36,7 @@ courseHandler.getCourseById = (req, res, next) => {
     //Required --> title, description, steps, auth headers
 courseHandler.createCourse = (req, res, next) => {
     //create reference to the user's ID who created the course on req.body
-    req.body.user = req.user._id;
+    req.body.user = req.session.userId;
     const {title, user, description, steps} = req.body;
 
     if (title && user && description && steps) {
@@ -58,7 +58,7 @@ courseHandler.createCourse = (req, res, next) => {
 // PUT /api/courses/:courseId 204 - Updates a course and returns no content
     //Required --> auth headers && atleast one of the fields on the schema to be updated
 courseHandler.updateCourse = (req, res, next) => {
-    const userId = req.user._id;
+    const userId = req.session.userId;
     const {courseId} = req.params;
     const {title, steps, description, estimatedTime, materialsNeeded} = req.body;
     if (title || steps || description || estimatedTime || materialsNeeded) {
@@ -97,7 +97,7 @@ courseHandler.updateCourse = (req, res, next) => {
 // Required --> auth and rating
 courseHandler.createReview = (req, res, next) => {
     //add a reference to the logged in user leaving the review
-    req.body.user = req.user._id;
+    req.body.user = req.session.userId;
     const {courseId} = req.params;
     const {rating} = req.body;
 

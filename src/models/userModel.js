@@ -21,7 +21,8 @@ const UserSchema = new Schema({
     password: {
         type: String,
         required: [true, "Password is required."]
-    }
+    },
+    interests: [String]
 });
 
 /**

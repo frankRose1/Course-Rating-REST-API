@@ -3,20 +3,15 @@ const User = mongoose.model('User');
 
 const userHandlers = {};
 
-// GET /api/users 200 - Returns the currently authenticated user
-userHandlers.getUser = (req, res, next) => {
-    //custom auth middleware will add the "user" propery to req
-    const id = req.user._id;
-
-    User.findById(id)
-        .exec((err, user) => {
-            if (err) {
-                return next(err);
-            }
-    
-            res.status(200)
-            res.json(user);
-        });
+// GET /api/users 200 - Returns info about the users in the DB
+userHandlers.getUsers = (req, res, next) => {
+    //this route is login Protected
+    User.find()
+    .select('fullName interests _id')
+    .exec((err, users) => {
+        if (err) return next(err);
+        res.status(200).json(users);
+    });
 };
 
 // POST /api/users 201 - Creates a user, sets the Location header to "/", and returns no content (SIGNUP)
@@ -29,14 +24,8 @@ userHandlers.createUser = (req, res, next) => {
                 error.status = 400;
                 return next(error);
             } 
-            // at this point we know the PW match
-            const userData = {
-                fullName,
-                emailAddress,
-                password
-            };
 
-            User.create(userData, (err, user) => {
+            User.create(req.body, (err, user) => {
                 if (err) {
                     if (err.code == 11000) {
                         const error = new Error('A user with that email already exists!');
@@ -49,8 +38,10 @@ userHandlers.createUser = (req, res, next) => {
                     }
                     return next(err);
                 } else {
-                    res.location("/");
-                    res.sendStatus(201);
+                    //log the user in
+                    req.session.userId = user._id;
+                    res.status(201);
+                    res.redirect("/api/users/profile");
                 }
             });
     } else {
@@ -60,5 +51,14 @@ userHandlers.createUser = (req, res, next) => {
     }
 };
 
+// GET /api/users/profile 200 --> if a user is currently signed in, they will have access to this route
+userHandlers.userProfile = (req, res, next) => {
+    User.findById(req.session.userId)
+        .select('fullName emailAddress interests _id')
+        .exec((err, user) => {
+            if (err) return next(err);
+            res.status(200).json(user);
+        });
+};
 
 module.exports = userHandlers;
