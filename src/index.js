@@ -50,7 +50,8 @@ app.use(bodyParser.urlencoded( {extended: true} ));
 // send a friendly greeting for the root route
 app.get('/', (req, res) => {
   res.json({
-    message: 'Welcome to the Course Review API'
+    message: 'Welcome to the Course Review API',
+    instructions: "Check out the readme.md for a guide! https://github.com/frankRose1/Course-Rating-REST-API/blob/master/readme.md"
   });
 });
 
