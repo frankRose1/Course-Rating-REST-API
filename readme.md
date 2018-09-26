@@ -1,8 +1,12 @@
 # Course Rating REST-API
 This is the back-end for a course rating service, built with Node, Express, and MongoDB. Users can sign up, see a list of courses in the database, add courses to the database, and add reviews for a specific course. Sessions are used to log users in and out as well as to grant permissions to certain routes. There is also middleware to prevent user's from reviewing their own courses. Postman was used for testing all routes and manual tests were written for specific user stories for good measure.
 
-## App Features
+## Heroku
+* This app is deployed on heroku [here](https://review-my-course.herokuapp.com/) if you'd like to try it out!
+* Note: many of the endpoints require authorization so you will need to use a service like postman to send post requests to sign up and create courses/post reviews
+* Routes such as ```/api/courses``` and ```/api/courses/:courseId``` do not require login/signup and can be viewed in the browser
 
+## App Features
 ### Users
 * ```GET /api/users 200``` - Returns a list of users in the DB
 * ```POST /api/users/register 201``` - Creates a user, logs the user in, redirects the user to their profile
