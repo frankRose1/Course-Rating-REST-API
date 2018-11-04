@@ -7,8 +7,6 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const passport = require('passport');
 const mongoose = require('mongoose');
-const session = require('express-session');
-const MongoStore = require('connect-mongo')(session); //let mongodb access the sessions
 const errorHandlers = require('./handlers/errorHandlers');
 const port = process.env.PORT || 5000;
 //import models before the router
@@ -18,6 +16,7 @@ require('./models/courseModel');
 const router = require('./routes');
 
 const app = express();
+app.set('port', port);
 
 mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true});
 //Use this instead if working with a local DB
@@ -32,32 +31,20 @@ db.once("open", () => {
   console.log("Connected to MongoDB.");
 });
 
+//set the headers
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, PUT, POST, PATCH, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  next();
+});
+
 app.use(passport.initialize());
 require('./handlers/passport')(passport);
-
-app.use(session({
-  secret: process.env.SESSION_SECRET, //signs the cookie, ensures this application created it
-  resave: true, //forces the session to be saved in the session store whether anything changed during the session or not
-  saveUninitialized: false, //new and unmodified sessions will not be saved in the session store
-  store: new MongoStore({
-    mongooseConnection: db
-  })
-}));
-
-// set the port
-app.set('port', port);
 
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded( {extended: true} ));
-
-//set the headers
-app.use((req, res, next) => {
-  res.setHeader('Allow-Access', '*');
-  res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Allow-Methods', '');
-  next();
-});
 
 // send a friendly greeting for the root route
 app.get('/', (req, res) => {

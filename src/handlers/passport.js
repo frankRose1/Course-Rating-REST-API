@@ -13,6 +13,7 @@ module.exports = passport => {
       User.findById(jwt_payload.id)
         .then(user => {
           if (user) {
+            delete user.password;
             return done(null, user);
           }
           return done(null, false);

@@ -1,51 +1,52 @@
 const express = require('express');
 const router = express.Router();
-const userHandlers = require('../handlers/userHandlers');
-const courseHandlers = require('../handlers/courseHandlers');
-const authHandler = require('../handlers/authHandler');
+const passport = require('passport');
+const userController = require('../controllers/userController');
+const courseController = require('../controllers/courseController');
+const authController = require('../controllers/authController');
 const middleware = require('../middleware');
 
-//all routes are prepended with "/api"
+//all routes are prepended with "/api/v1"
 
 //user routes
 router.get('/users', 
-  authHandler.requiresLogin, 
-  userHandlers.getUsers
+  passport.authenticate('jwt', {session: false}), 
+  userController.getUsers
 );
 router.post('/users/register',
-  authHandler.requiresLogout,
-  userHandlers.createUser
+  authController.requiresLogout,
+  userController.createUser
 );
 router.get('/users/profile', 
-  authHandler.requiresLogin, 
-  userHandlers.userProfile
+  passport.authenticate('jwt', {session: false}), 
+  userController.userProfile
 );
 
 //course routes
-router.get('/courses', courseHandlers.getCourses);
-router.get('/courses/:courseId', courseHandlers.getCourseById);
+router.get('/courses', courseController.getCourses);
+router.get('/courses/:courseId', courseController.getCourseById);
 router.post('/courses', 
-  authHandler.requiresLogin, 
-  courseHandlers.createCourse
+  passport.authenticate('jwt', {session: false}), 
+  courseController.createCourse
 );
 router.put('/courses/:courseId', 
-  authHandler.requiresLogin, 
-  courseHandlers.updateCourse
+  passport.authenticate('jwt', {session: false}), 
+  courseController.updateCourse
 );
 router.post('/courses/:courseId/reviews', 
-  authHandler.requiresLogin,
+  passport.authenticate('jwt', {session: false}),
   middleware.checkOwner,
-  courseHandlers.createReview
+  courseController.createReview
 );
 
 //auth routes
 router.post('/login',
-  authHandler.requiresLogout,
-  authHandler.login
+  authController.requiresLogout,
+  authController.login
 );
 router.get('/logout',
-  authHandler.requiresLogin,
-  authHandler.logout
+  passport.authenticate('jwt', {session: false}),
+  authController.logout
 );
 
 module.exports = router;

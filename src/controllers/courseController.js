@@ -2,10 +2,10 @@ const mongoose = require('mongoose');
 const Course = mongoose.model('Course');
 const Review = mongoose.model('Review');
 
-const courseHandler = {};
+const courseController = {};
 
 // GET /api/courses 200 - Returns the Course "_id" and "title" properties
-courseHandler.getCourses = (req, res, next) => {
+courseController.getCourses = (req, res, next) => {
     Course.find({})
             .select('_id title')
             .exec((err, courses) => {
@@ -19,7 +19,7 @@ courseHandler.getCourses = (req, res, next) => {
 };
 
 //GET /api/course/:courseId 200 - Returns all Course properties and related documents for the provided course ID
-courseHandler.getCourseById = (req, res, next) => {
+courseController.getCourseById = (req, res, next) => {
     const {courseId} = req.params;
     Course.findById(courseId)
             .exec((err, course) => {
@@ -34,7 +34,7 @@ courseHandler.getCourseById = (req, res, next) => {
 
 //POST /api/courses 201 - Creates a course, sets the Location header, and returns no content
     //Required --> title, description, steps, auth headers
-courseHandler.createCourse = (req, res, next) => {
+courseController.createCourse = (req, res, next) => {
     //create reference to the user's ID who created the course on req.body
     req.body.user = req.session.userId;
     const {title, user, description, steps} = req.body;
@@ -57,7 +57,7 @@ courseHandler.createCourse = (req, res, next) => {
 
 // PUT /api/courses/:courseId 204 - Updates a course and returns no content
     //Required --> auth headers && atleast one of the fields on the schema to be updated
-courseHandler.updateCourse = (req, res, next) => {
+courseController.updateCourse = (req, res, next) => {
     const userId = req.session.userId;
     const {courseId} = req.params;
     const {title, steps, description, estimatedTime, materialsNeeded} = req.body;
@@ -95,7 +95,7 @@ courseHandler.updateCourse = (req, res, next) => {
 
 //POST /api/courses/:courseId/reviews 201 - Creates a review for the specified course ID, sets the Location header to the related course, and returns no content
 // Required --> auth and rating
-courseHandler.createReview = (req, res, next) => {
+courseController.createReview = (req, res, next) => {
     //add a reference to the logged in user leaving the review
     req.body.user = req.session.userId;
     const {courseId} = req.params;
@@ -137,4 +137,4 @@ courseHandler.createReview = (req, res, next) => {
 };
 
 
-module.exports = courseHandler;
+module.exports = courseController;

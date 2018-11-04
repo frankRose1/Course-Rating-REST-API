@@ -1,9 +1,11 @@
-const authHandler = {};
+const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 
+const authController = {};
+
 //if the credentials match a document in the database, a user is logged in
-authHandler.login = (req, res, next) => {
+authController.login = (req, res, next) => {
   const {emailAddress, password} = req.body
   if (emailAddress && password) {
     User.authenticate(emailAddress, password, (err, user) => {
@@ -12,9 +14,13 @@ authHandler.login = (req, res, next) => {
         err.status = 400;
         return next(err);
       } else {
-        // add the property of the session or create a new session if one doesnt exist yet
-        req.session.userId = user._id;
-        res.redirect('/api/users/profile');
+        const payload = {
+          id: user._id,
+          name: user.fullName,
+          avatar: user.avatar
+        }
+        const token = jwt.sign(payload, process.env.APP_SECRET, { expiresIn: '1h' });
+        res.json({token});
       }
     });
   } else {
@@ -24,7 +30,7 @@ authHandler.login = (req, res, next) => {
   }
 };
 
-authHandler.logout = (req, res, next) => {
+authController.logout = (req, res, next) => {
   //check for a session
   if (req.session) {
     //session has a destroy method that will end the session and we can tell express what to do after its gone
@@ -39,7 +45,7 @@ authHandler.logout = (req, res, next) => {
 /**
  * @summary Middleware for any route the requires a user to be signed in
  */
-authHandler.requiresLogin = (req, res, next) => {
+authController.requiresLogin = (req, res, next) => {
   if (req.session && req.session.userId) {
     return next();
   } else {
@@ -52,13 +58,13 @@ authHandler.requiresLogin = (req, res, next) => {
 /**
  * @summary Only logged out users should be able to visit enpoints such as "api/register" and "api/login"
  */
-authHandler.requiresLogout = (req, res, next) => {
-    //if both are present then a user is logged in and should be redirected to their profile
-    if (req.session && req.session.useId) {
-        return res.redirect("api/users/profile");
+authController.requiresLogout = (req, res, next) => {
+    if (req.user) {
+      const error = new Error('You need to be logged out to use this endpoint.');
+      error.status = 400;
+      return next(error);
     }
-    //if not logged in carry on to next middleware
     next();
 }
 
-module.exports = authHandler;
+module.exports = authController;
