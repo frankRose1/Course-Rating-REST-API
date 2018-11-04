@@ -5,6 +5,7 @@ require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
+const passport = require('passport');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session); //let mongodb access the sessions
@@ -31,6 +32,9 @@ db.once("open", () => {
   console.log("Connected to MongoDB.");
 });
 
+app.use(passport.initialize());
+require('./handlers/passport')(passport);
+
 app.use(session({
   secret: process.env.SESSION_SECRET, //signs the cookie, ensures this application created it
   resave: true, //forces the session to be saved in the session store whether anything changed during the session or not
@@ -47,6 +51,14 @@ app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded( {extended: true} ));
 
+//set the headers
+app.use((req, res, next) => {
+  res.setHeader('Allow-Access', '*');
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Allow-Methods', '');
+  next();
+});
+
 // send a friendly greeting for the root route
 app.get('/', (req, res) => {
   res.json({
@@ -55,13 +67,13 @@ app.get('/', (req, res) => {
   });
 });
 
-//routes
-app.use("/api", router);
-
 // to test the global error handler
-app.get('/error', function (req, res) {
+app.get('/error', (req, res) => {
   throw new Error('Test error');
 });
+
+//routes
+app.use("/api/v1", router);
 
 // send 404 if no other route matched
 app.use(errorHandlers.notFound);
