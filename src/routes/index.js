@@ -5,6 +5,7 @@ const userController = require('../controllers/userController');
 const courseController = require('../controllers/courseController');
 const authController = require('../controllers/authController');
 const middleware = require('../middleware');
+const {createRegisterValidation, createLoginValidation, validateInputs} = require('../handlers/validation');
 
 //all routes are prepended with "/api/v1"
 
@@ -14,7 +15,8 @@ router.get('/users',
   userController.getUsers
 );
 router.post('/users/register',
-  authController.requiresLogout,
+  createRegisterValidation,
+  validateInputs,
   userController.createUser
 );
 router.get('/users/profile', 
@@ -41,12 +43,9 @@ router.post('/courses/:courseId/reviews',
 
 //auth routes
 router.post('/login',
-  authController.requiresLogout,
+  createLoginValidation,
+  validateInputs,
   authController.login
-);
-router.get('/logout',
-  passport.authenticate('jwt', {session: false}),
-  authController.logout
 );
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const validator = require('validator');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 
 const UserSchema = new Schema({
@@ -34,22 +34,24 @@ const UserSchema = new Schema({
  */
 UserSchema.statics.authenticate = function(email, password, callback){
     this.findOne({emailAddress: email})
-        .exec(function(err ,user){
+        .exec(function(err, user){
             if (err) {
-                callback(err);
+                return callback(err);
             }
             if (!user) {
                 const error = new Error('Could not find a user with that email address.');
                 error.status = 404;
-                callback(error);
+                return callback(error);
             }
 
             //if a user was found compare the password provided with the hashed password in the db
             bcrypt.compare(password, user.password, function(err, res){
                 if (res) {
-                    callback(null, user);
+                    return callback(null, user);
                 } else {
-                    callback(err);
+                    const error = new Error('Incorrect password.');
+                    error.status = 400;
+                    return callback(error);
                 }
             });
         });
@@ -58,6 +60,10 @@ UserSchema.statics.authenticate = function(email, password, callback){
 //Hash the user's plain text password before a save
 UserSchema.pre("save", function(next){
     const user = this;
+    if (!user.isModified('password')){
+        return next();
+    }
+    
     bcrypt.hash(user.password, 10, function(err, hash){
         if (err) {
             return next(err);

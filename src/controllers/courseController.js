@@ -6,36 +6,40 @@ const courseController = {};
 
 // GET /api/courses 200 - Returns the Course "_id" and "title" properties
 courseController.getCourses = (req, res, next) => {
-    Course.find({})
-            .select('_id title')
-            .exec((err, courses) => {
-                if (err) {
-                    return next(err);
-                }
-
-                res.status(200);
-                res.json(courses);
-            });
+  Course
+    .find({})
+    .select('_id title')
+    .then(courses => {
+      res.status(200).json(courses);
+    })
+    .catch(err => {
+      next(err);
+    });
 };
+
 
 //GET /api/course/:courseId 200 - Returns all Course properties and related documents for the provided course ID
 courseController.getCourseById = (req, res, next) => {
     const {courseId} = req.params;
     Course.findById(courseId)
-            .exec((err, course) => {
-                if (err) {
-                    return next(err);
-                }
-                
-                res.status(200);
-                res.json(course);
-            });
+      .then(course => {
+        if (!course) {
+          const error = new Error('Could not find a course with that ID.');
+          error.status = 404;
+          throw error;
+        }
+
+        res.status(200).json(course);
+      })
+      .catch(err => {
+        next(err);
+      });
 };
 
 //POST /api/courses 201 - Creates a course, sets the Location header, and returns no content
     //Required --> title, description, steps, auth headers
 courseController.createCourse = (req, res, next) => {
-    //create reference to the user's ID who created the course on req.body
+
     req.body.user = req.session.userId;
     const {title, user, description, steps} = req.body;
 
