@@ -6,7 +6,7 @@ const authController = {};
 
 //if the credentials match a document in the database, a user is logged in
 authController.login = (req, res, next) => {
-  const {emailAddress, password} = req.body
+  const {emailAddress, password} = req.body;
   User.authenticate(emailAddress, password, (err, user) => {
     if (err) {
       return next(err);
@@ -17,7 +17,7 @@ authController.login = (req, res, next) => {
         avatar: user.avatar
       }
       const token = jwt.sign(payload, process.env.APP_SECRET, { expiresIn: '1h' });
-      res.json({token});
+      res.status(200).json({token});
     }
   });
 };

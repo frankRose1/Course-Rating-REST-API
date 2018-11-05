@@ -19,6 +19,7 @@ const CourseSchema = new Schema({
     },
     estimatedTime: {
         type: String,
+        required: [true, "Please provide an estimated time of course completion."],
         trim: true
     },
     materialsNeeded: {
@@ -54,44 +55,39 @@ CourseSchema.statics.checkCourseOwner = function(courseId, userId, callback){
     this.findById(courseId)
         .exec((err, course) => {
             if (err) {
-                callback(err);
-            }
-            if (!course) {
-                const error = new Error('Could not find a course with that ID.');
-                error.status = 404;
-                callback(error);
+                return callback(err);
             }
 
+            let error;
+            if (!course) {
+                error = new Error('Could not find a course with that ID.');
+                error.status = 404;
+                return callback(error);
+            }
+            
             //compare the user's id on the request to the user who owns this course
             if (course.user._id.equals(userId)) {
-                //if they match, callback an error
-                const error = new Error('You can\'t post a review on your own course!');
+                error = new Error('You can\'t post a review on your own course!');
                 error.status = 403;
-                callback(error);
+                return callback(error);
             } else {
                 callback(null);
             }
         });
 };
 
-CourseSchema.method("update", function(updates, callback){
-    Object.assign(this, updates);
-
-    this.save(callback);
-});
-
 //Auto populate the reviews and course owner each time a query is made for a specific course
-//Use deep population to return only the users fullname and ID on the related course and on the individual reviews
+//Use deep population to return only the users fullname, avatar(if they have one), and ID on the related course and on the individual reviews
 function autoPopulate(next){
     this
-        .populate('user', 'fullName')
+        .populate('user', 'fullName avatar')
         .populate({
             path: 'reviews',
             model: 'Review',
             populate: {
                 path: 'user',
                 model: 'User',
-                select: 'fullName'
+                select: 'fullName avatar'
             }
         });
 

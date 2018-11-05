@@ -5,7 +5,12 @@ const userController = require('../controllers/userController');
 const courseController = require('../controllers/courseController');
 const authController = require('../controllers/authController');
 const middleware = require('../middleware');
-const {createRegisterValidation, createLoginValidation, validateInputs} = require('../handlers/validation');
+const { 
+  createRegisterValidation, 
+  createLoginValidation,
+  createCourseValidation,
+  createReviewValidation,
+  validateInputs } = require('../handlers/validation');
 
 //all routes are prepended with "/api/v1"
 
@@ -28,17 +33,23 @@ router.get('/users/profile',
 router.get('/courses', courseController.getCourses);
 router.get('/courses/:courseId', courseController.getCourseById);
 router.post('/courses', 
-  passport.authenticate('jwt', {session: false}), 
+  passport.authenticate('jwt', {session: false}),
+  createCourseValidation,
+  validateInputs,
   courseController.createCourse
 );
 router.put('/courses/:courseId', 
-  passport.authenticate('jwt', {session: false}), 
+  passport.authenticate('jwt', {session: false}),
+  createCourseValidation,
+  validateInputs,
   courseController.updateCourse
 );
 router.post('/courses/:courseId/reviews', 
   passport.authenticate('jwt', {session: false}),
+  createReviewValidation,
+  validateInputs,
   middleware.checkOwner,
-  courseController.createReview
+  courseController.createReviewRefactor
 );
 
 //auth routes
