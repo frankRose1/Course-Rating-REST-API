@@ -32,6 +32,8 @@ router.get(
   passport.authenticate('jwt', { session: false }),
   userController.userProfile
 );
+router.get('/users/interests', userController.getUsersByInterest);
+router.get('/users/interests/:interest', userController.getUsersByInterest);
 
 //course routes
 router.get('/courses', courseController.getCourses);

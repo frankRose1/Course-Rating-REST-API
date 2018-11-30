@@ -7,8 +7,7 @@ const userController = {};
 
 // GET /api/users 200 - Returns info about the users in the DB
 userController.getUsers = (req, res, next) => {
-  User
-    .find({})
+  User.find({})
     .select('fullName interests _id avatar')
     .then(users => {
       res.status(200).json(users);
@@ -21,9 +20,9 @@ userController.getUsers = (req, res, next) => {
 // POST /api/users 201 - Creates a user, sets the Location header to "/", and returns no content (SIGNUP)
 userController.createUser = (req, res, next) => {
   const avatar = gravatar.url(req.body.emailAddress, {
-    r: "pg", //Rating,
-    s: "200", //Size
-    d: "mm" //Default photo
+    r: 'pg', //Rating,
+    s: '200', //Size
+    d: 'mm' //Default photo
   });
 
   const data = {
@@ -31,7 +30,8 @@ userController.createUser = (req, res, next) => {
     avatar
   };
   const user = new User(data);
-  user.save()
+  user
+    .save()
     .then(user => {
       //send a token to the client
       const payload = {
@@ -39,8 +39,10 @@ userController.createUser = (req, res, next) => {
         name: user.fullName,
         avatar: user.avatar
       };
-      const token = jwt.sign(payload, process.env.APP_SECRET, { expiresIn: '1h' });
-      res.status(201).json({token});
+      const token = jwt.sign(payload, process.env.APP_SECRET, {
+        expiresIn: '1h'
+      });
+      res.status(201).json({ token });
     })
     .catch(err => {
       next(err);
@@ -49,8 +51,26 @@ userController.createUser = (req, res, next) => {
 
 // GET /api/users/profile 200 --> if a user is currently signed in, they will have access to the user object provided by passport
 userController.userProfile = (req, res, next) => {
-  const {fullName, avatar, _id, interests} = req.user;
-  res.status(200).json({fullName, avatar, _id, interests});
+  const { fullName, avatar, _id, interests } = req.user;
+  res.status(200).json({ fullName, avatar, _id, interests });
+};
+
+//GET api/v1/users/interests && api/v1/users/interests/:interest
+//aggregate the interests and if there is a param, find users with that interest
+userController.getUsersByInterest = (req, res, next) => {
+  const { interest } = req.params;
+  const query = interest || { $exists: true }; //fallback to any user with any interest
+  const intPromise = User.getInterestsList();
+  const userPromise = User.find({ interests: query }).select(
+    'fullName interests _id avatar'
+  );
+  Promise.all([intPromise, userPromise])
+    .then(([interests, users]) => {
+      res.json({ interests, users });
+    })
+    .catch(err => {
+      next(err);
+    });
 };
 
 module.exports = userController;
