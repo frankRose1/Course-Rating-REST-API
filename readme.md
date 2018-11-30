@@ -1,5 +1,5 @@
 # Course Rating REST-API
-This is the back-end for a course rating service, built with Node, Express, and MongoDB. Users can sign up, see a list of courses in the database, add courses to the database, and add reviews for a specific course. Json web tokens are used to authenticate users and protect certain routes. After registering/logging in a json web token will be sent to the client which is valid for 1 hour. There is also middleware to prevent user's from reviewing their own courses and server side validation for inputs. Also added gravatar to give users an avatar image. Postman was used for testing all routes and manual tests were written for specific user stories for good measure.
+This is the back-end for a course rating service, built with Node, Express, and MongoDB. Users can sign up, see a list of courses in the database, add courses to the database, and add reviews for a specific course. JWTs are used to authenticate users and protect certain routes. After registering/logging in a JWT will be sent to the client which is valid for 1 hour. There is also middleware to prevent user's from reviewing their own courses and server side validation for inputs. Custom aggregations are on the Course and User models. Postman was used for testing all routes and manual tests were written for specific user stories for good measure.
 
 ## Heroku
 * This app is deployed on heroku [here](https://review-my-course.herokuapp.com/) if you'd like to try it out!
@@ -9,7 +9,7 @@ This is the back-end for a course rating service, built with Node, Express, and 
 ## App Features
 ### Users
 * ```GET /api/v1/users 200``` - Returns a list of users in the DB
-* ```POST /api/v1/users/register 201``` - Creates a user, logs the user in, redirects the user to their profile
+* ```POST /api/v1/users/register 201``` - Creates a user, sends jwt to client
     * "interests" are optional:
     ```javascript
         {
@@ -20,12 +20,15 @@ This is the back-end for a course rating service, built with Node, Express, and 
             "interests" ["Programming", "Literature"]
         }
     ```
-* ```GET /api/v1/users/profile 200 ``` - 
+* ```GET /api/v1/users/profile 200 ``` - Returns currently signed in users profile
+* ```GET /api/v1/users/interests 200 ``` - Aggregates and returns a list of interests and the number of users with a particular interest
+* ```GET /api/v1/users/interests/:interest 200 ``` - Returns users who have the interest provided in the params
 
 ### Courses
 * ```GET /api/v1/courses 200``` - Returns the Course "_id" and "title" properties for all courses in the DB
 * ```GET /api/v1/course/:courseId 200``` - Returns all Course properties and related documents for the provided course ID
     * auto population and deep population is used to return only the ```fullName```, ```_id``` and ```avatar``` fields on the user who created the course and the users who created the reviews
+* ```GET /api/v1/courses/top-rated 200``` - Aggregates the top rated courses and sorts them by average rating. Course needs to have at least 2 reviews to be considered. Also limits results to a max of 10; 
 * ```POST /api/v1/courses 201``` - Creates a course, sets the Location header, and returns created status code
     * "steps" and "materialsNeeded" are optional
     ```javascript
@@ -61,6 +64,7 @@ This is the back-end for a course rating service, built with Node, Express, and 
 
 ### Models
 * User model has a pre-save hook that uses ```bcryptjs``` to hash the user's password
+* User and Course models have aggregations
 * User model has a custom authentication method on statics
     * Attempts to find a user in the DB via emailAddress
     * If a user is found bcrypt compares the password provided with the hashed password in the DB
@@ -86,6 +90,7 @@ This is the back-end for a course rating service, built with Node, Express, and 
 * body-parser
 * dotenv
 * morgan
+* express-validator
 * validator
 * jsonwebtoken
 * passport
