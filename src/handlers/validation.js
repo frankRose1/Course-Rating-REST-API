@@ -3,7 +3,7 @@
  *    This is meant to be an extra check before the data reaches the db
  */
 
-const {body, validationResult} = require('express-validator/check');
+const { body, validationResult } = require('express-validator/check');
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
 
@@ -14,51 +14,63 @@ validator.createLoginValidation = [
     .isEmail()
     .withMessage('Please provide a properly formatted email address.'),
   body('password', 'Plese provide your password.')
-    .not().isEmpty()
-    .isLength({min: 8})
+    .not()
+    .isEmpty()
+    .isLength({ min: 8 })
 ];
 
 validator.createRegisterValidation = [
   body('fullName')
-    .not().isEmpty()
+    .not()
+    .isEmpty()
     .withMessage('Please provide your name.'),
   body('emailAddress')
     .isEmail()
     .withMessage('Please provide a properly formatted email address.')
-    .custom((value, {req}) => {
-      return User.findOne( {emailAddress: value} )
-        .then(user => {
-          if (user) return Promise.reject('A user with that email address already exists!')
-        })
+    .custom((value, { req }) => {
+      return User.findOne({ emailAddress: value }).then(user => {
+        if (user)
+          return Promise.reject(
+            'A user with that email address already exists!'
+          );
+      });
     }),
   body('password', 'Password must be at least 8 characters.')
     .trim()
-    .isLength({min: 8}),
+    .isLength({ min: 8 }),
   body('confirmPassword')
     .trim()
-    .custom((value, {req}) => {
-    if (value !== req.body.password){
-      throw new Error('Passwords must match.')
-    }
-    return true;
-  })
+    .custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error('Passwords must match.');
+      }
+      return true;
+    })
 ];
 
 validator.createCourseValidation = [
-  body('title', 'Please provide a course title at least 5 characters long, numbers and letters only!')
+  body('title', 'Please provide a course title at least 5 characters long.')
     .trim()
     .isString()
-    .isLength({min: 5}),
-  body('description', 'Please provide a course description at least 10 characters long.')
+    .isLength({ min: 5 }),
+  body(
+    'description',
+    'Please provide a course description at least 10 characters long.'
+  )
     .trim()
-    .isLength({min: 10}),
-  body('estimatedTime', "Please provide an estimated time of course completion.")
-    .not().isEmpty()
+    .isLength({ min: 10 }),
+  body(
+    'estimatedTime',
+    'Please provide an estimated time of course completion.'
+  )
+    .not()
+    .isEmpty()
 ];
 
 validator.createReviewValidation = [
   body('rating', 'Please leave a rating between 1 and 5.')
-    .not().isEmpty()
+    .not()
+    .isEmpty()
 ];
 
 validator.validateInputs = (req, res, next) => {
@@ -66,7 +78,7 @@ validator.validateInputs = (req, res, next) => {
 
   if (errors.isEmpty()) return next();
 
-  res.status(422).json( { errors: errors.array().map(err => err.msg )} );
+  res.status(422).json({ errors: errors.array().map(err => err.msg) });
 };
 
 module.exports = validator;
