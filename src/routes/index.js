@@ -17,7 +17,7 @@ const {
 //user routes
 router.get('/users', authenticate, userController.getUsers);
 router.post(
-  '/users/register',
+  '/users',
   createRegisterValidation,
   validateInputs,
   userController.createUser

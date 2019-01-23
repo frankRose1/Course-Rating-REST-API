@@ -8,7 +8,7 @@ const userController = {};
 // GET /api/users 200 - Returns info about the users in the DB
 userController.getUsers = (req, res, next) => {
   User.find({})
-    .select('fullName interests _id avatar')
+    .select('-_id fullName interests avatar')
     .then(users => {
       res.status(200).json(users);
     })
@@ -17,7 +17,7 @@ userController.getUsers = (req, res, next) => {
     });
 };
 
-// POST /api/users 201 - Creates a user, sets the Location header to "/", and returns no content (SIGNUP)
+// POST /api/users 201 - Creates a user, sets the Location header to "/", and returns a token
 userController.createUser = (req, res, next) => {
   const avatar = gravatar.url(req.body.emailAddress, {
     r: 'pg', //Rating,
@@ -33,26 +33,31 @@ userController.createUser = (req, res, next) => {
   user
     .save()
     .then(user => {
-      //send a token to the client
-      const payload = {
-        id: user._id,
-        name: user.fullName,
-        avatar: user.avatar
-      };
-      const token = jwt.sign(payload, process.env.APP_SECRET, {
-        expiresIn: '1h'
-      });
-      res.status(201).json({ token });
+      const token = user.generateAuthToken();
+      res
+        .status(201)
+        .location('/')
+        .json({ token });
     })
     .catch(err => {
       next(err);
     });
 };
 
-// GET /api/users/profile 200 --> if a user is currently signed in, they will have access to the user object provided by passport
+// GET /api/users/profile 200 --> if a user is currently signed in, req.user will have the ID
 userController.userProfile = (req, res, next) => {
-  const { fullName, avatar, _id, interests } = req.user;
-  res.status(200).json({ fullName, avatar, _id, interests });
+  const { id } = req.user;
+  User.findById(id)
+    .select('-_id fullName interests avatar')
+    .then(user => {
+      if (!user) {
+        return res.status(404).json({ message: 'No User Found.' });
+      }
+      res.status(200).json({ currentUser: user });
+    })
+    .catch(err => {
+      next(err);
+    });
 };
 
 //GET api/v1/users/interests && api/v1/users/interests/:interest
@@ -62,7 +67,7 @@ userController.getUsersByInterest = (req, res, next) => {
   const query = interest || { $exists: true }; //fallback to any user with any interest
   const intPromise = User.getInterestsList();
   const userPromise = User.find({ interests: query }).select(
-    'fullName interests _id avatar'
+    '-_id fullName interests avatar'
   );
   Promise.all([intPromise, userPromise])
     .then(([interests, users]) => {

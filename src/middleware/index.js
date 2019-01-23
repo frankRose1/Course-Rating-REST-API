@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const middleware = {};
 
 middleware.authenticate = (req, res, next) => {
-  const token = req.header('bearer');
+  const token = req.header('authorization');
   if (!token)
     return res.status(401).json({ error: 'Unauthorized. No token provided.' });
 
