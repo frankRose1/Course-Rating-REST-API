@@ -1,38 +1,29 @@
-const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 const User = mongoose.model('User');
 
 const authController = {};
 
-//if the credentials match a document in the database, a user is logged in
 authController.login = (req, res, next) => {
-  const {emailAddress, password} = req.body;
-  User.authenticate(emailAddress, password, (err, user) => {
-    if (err) {
-      return next(err);
-    } else {
-      const payload = {
-        id: user._id,
-        name: user.fullName,
-        avatar: user.avatar
+  const { emailAddress, password } = req.body;
+  User.findOne({ emailAddress: emailAddress })
+    .then(user => {
+      if (!user) {
+        return res.status(400).json({ message: 'Invalid email or password' });
       }
-      const token = jwt.sign(payload, process.env.APP_SECRET, { expiresIn: '1h' });
-      res.status(200).json({token});
-    }
-  });
+
+      bcrypt.compare(password, user.password, (err, isValid) => {
+        if (isValid) {
+          const token = user.generateAuthToken();
+          return res.json({ token });
+        } else {
+          return res.status(400).json({ message: 'Invalid email or password' });
+        }
+      });
+    })
+    .catch(err => {
+      next(err);
+    });
 };
-
-
-/**
- * @summary Only logged out users should be able to visit enpoints such as "api/register" and "api/login"
- */
-authController.requiresLogout = (req, res, next) => {
-  if (req.user) {
-    const error = new Error('You need to be logged out to use this endpoint.');
-    error.status = 400;
-    return next(error);
-  }
-  next();
-}
 
 module.exports = authController;

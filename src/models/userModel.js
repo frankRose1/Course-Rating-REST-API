@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const UserSchema = new Schema({
   fullName: {
@@ -25,34 +26,11 @@ const UserSchema = new Schema({
   interests: [String]
 });
 
-/**
- * Authenticate a user using bcrypt
- * @param {string} email - provided by the user in req.body or in Auth Headers
- * @param {string} password - provided by the user in req.body or in Auth Headers
- * @param {function} callback - return an error and/or a user
- */
-UserSchema.statics.authenticate = function(email, password, callback) {
-  this.findOne({ emailAddress: email }).exec(function(err, user) {
-    if (err) {
-      return callback(err);
-    }
-    if (!user) {
-      const error = new Error('Could not find a user with that email address.');
-      error.status = 404;
-      return callback(error);
-    }
-
-    //if a user was found compare the password provided with the hashed password in the db
-    bcrypt.compare(password, user.password, function(err, res) {
-      if (res) {
-        return callback(null, user);
-      } else {
-        const error = new Error('Incorrect password.');
-        error.status = 400;
-        return callback(error);
-      }
-    });
+UserSchema.methods.generateAuthToken = function() {
+  const token = jwt.sign({ id: this._id }, process.env.APP_SECRET, {
+    expiresIn: '1h'
   });
+  return token;
 };
 
 //Get a list of interests and the number of users with that interest
