@@ -3,7 +3,8 @@ const router = express.Router();
 const userController = require('../controllers/userController');
 const courseController = require('../controllers/courseController');
 const authController = require('../controllers/authController');
-const { authenticate, checkOwner } = require('../middleware');
+const checkOwner = require('../middleware/checkCourseOwner');
+const authenticate = require('../middleware/auth');
 const {
   createRegisterValidation,
   createLoginValidation,
