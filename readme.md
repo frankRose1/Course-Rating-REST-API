@@ -26,7 +26,7 @@ This is the back-end for a course rating service, built with Node, Express, and 
 
 ### Courses
 * ```GET /api/v1/courses 200``` - Returns the Course "_id" and "title" properties for all courses in the DB
-* ```GET /api/v1/course/:courseId 200``` - Returns all Course properties and related documents for the provided course ID
+* ```GET /api/v1/courses/:courseId 200``` - Returns all Course properties and related documents for the provided course ID
     * auto population and deep population is used to return only the ```fullName```, ```_id``` and ```avatar``` fields on the user who created the course and the users who created the reviews
 * ```GET /api/v1/courses/top-rated 200``` - Aggregates the top rated courses and sorts them by average rating. Course needs to have at least 2 reviews to be considered. Also limits results to a max of 10; 
 * ```POST /api/v1/courses 201``` - Creates a course, sets the Location header, and returns created status code

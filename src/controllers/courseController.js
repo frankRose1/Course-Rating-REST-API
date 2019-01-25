@@ -39,7 +39,7 @@ courseController.getCourseById = (req, res, next) => {
 courseController.createCourse = (req, res, next) => {
   const data = {
     ...req.body,
-    user: req.user._id
+    user: req.user.id
   };
   const course = new Course(data);
   course
@@ -89,7 +89,7 @@ courseController.updateCourse = (req, res, next) => {
 //POST /api/courses/:courseId/reviews 201 - Creates a review for the specified course ID,
 //sets the Location header to the related course, and returns no content
 // Required --> auth and rating
-courseController.createReviewRefactor = (req, res, next) => {
+courseController.createReview = (req, res, next) => {
   req.body.rating =
     typeof req.body.rating === 'number'
       ? req.body.rating
@@ -97,7 +97,7 @@ courseController.createReviewRefactor = (req, res, next) => {
 
   const reviewData = {
     ...req.body,
-    user: req.user._id
+    user: req.user.id
   };
 
   let savedReviewId;

@@ -34,7 +34,7 @@ router.get(
 //course routes
 router.get('/courses', courseController.getCourses);
 router.get('/courses/top-rated', courseController.getTopRated);
-router.get('/course/:courseId', courseController.getCourseById);
+router.get('/courses/:courseId', courseController.getCourseById);
 router.post(
   '/courses',
   authenticate,
@@ -55,7 +55,7 @@ router.post(
   createReviewValidation,
   validateInputs,
   checkOwner,
-  courseController.createReviewRefactor
+  courseController.createReview
 );
 
 //auth routes
