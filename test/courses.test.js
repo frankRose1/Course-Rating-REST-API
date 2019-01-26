@@ -2,7 +2,6 @@ const request = require('supertest');
 const Course = require('../src/models/courseModel');
 const User = require('../src/models/userModel');
 const { Types } = require('mongoose');
-let server;
 
 const testUser = {
   fullName: 'John Smith',
@@ -48,8 +47,26 @@ const testCourse2 = {
   ]
 };
 
+// Missing Fields ==> title, description, estimatedTime
+const invalidCourse = {
+  user: testUser._id,
+  materialsNeeded: 'blah blah',
+  steps: [
+    {
+      stepNumber: 1,
+      title: 'What is GraphQL',
+      description:
+        'GraphQL is a query language that makes querying much cleaner and faster...'
+    }
+  ]
+}
+
 describe('/api/v1/courses', () => {
+  let server;
+  let token;
+
   beforeEach(() => {
+    token = new User().generateAuthToken()
     server = require('../src/index');
   });
 
@@ -75,6 +92,26 @@ describe('/api/v1/courses', () => {
     });
   });
 
+  describe('POST /', () => {
+    it('should return a 201 and set the location header to the newly created course', async () => {
+      const res = await request(server)
+        .post('/api/v1/courses')
+        .set('Authorization', token)
+        .send(testCourse1);
+        console.log(res.headers)
+      expect(res.status).toBe(201)
+    })
+
+    it('should return a 422 for a course with invalid fields', async () => {
+      const res = await request(server)
+        .post('/api/v1/courses')
+        .set('Authorization', token)
+        .send(invalidCourse);
+      console.log(res.body)
+      expect(res.status).toBe(422);
+    })
+  })
+
   describe('GET /:courseId', () => {
     it('should return a course for a valid ID', async () => {
       const course = new Course(testCourse1);
@@ -95,4 +132,6 @@ describe('/api/v1/courses', () => {
       expect(res.body.message).toBe('Could not find a course with that ID.');
     });
   });
+
+  
 });

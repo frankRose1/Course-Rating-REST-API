@@ -4,7 +4,6 @@ require('dotenv').config({ path: '.env' });
 const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
-// const passport = require('passport');
 const errorHandlers = require('./handlers/errorHandlers');
 const port = process.env.PORT || 5000;
 //import models before the router
@@ -26,9 +25,6 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
-
-// app.use(passport.initialize());
-// require('./handlers/passport')(passport);
 
 // app.use(morgan('dev'));
 app.use(bodyParser.json());

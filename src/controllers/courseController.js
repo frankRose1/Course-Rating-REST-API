@@ -46,9 +46,8 @@ courseController.createCourse = (req, res, next) => {
     .save()
     .then(course => {
       res
-        .status(201)
         .location(`/api/v1/courses/${course._id}`)
-        .json(course);
+        .sendStatus(201);
     })
     .catch(err => {
       next(err);

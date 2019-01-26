@@ -29,7 +29,7 @@ This is the back-end for a course rating service, built with Node, Express, and 
 * ```GET /api/v1/courses/:courseId 200``` - Returns all Course properties and related documents for the provided course ID
     * auto population and deep population is used to return only the ```fullName```, ```_id``` and ```avatar``` fields on the user who created the course and the users who created the reviews
 * ```GET /api/v1/courses/top-rated 200``` - Aggregates the top rated courses and sorts them by average rating. Course needs to have at least 2 reviews to be considered. Also limits results to a max of 10; 
-* ```POST /api/v1/courses 201``` - Creates a course, sets the Location header, and returns created status code
+* ```POST /api/v1/courses 201``` - Creates a course, sets the Location headers, and returns created status code
     * "steps" and "materialsNeeded" are optional
     ```javascript
         {
@@ -71,17 +71,15 @@ This is the back-end for a course rating service, built with Node, Express, and 
     * If they match the user document is returned in the callback
     * If they dont match an error is passed to the callback
 
-### Permissions/Auth
-* Json web token should be sent as a Bearer token in the authorization headers for protected routes:
-    ```"Authorization": "Bearer yourJWThere"```
+### Auth
+* Json web token should be sent as in the Authorization headers for protected routes:
+    ```"Authorization": "yourJWThere"```
 * ```/api/v1/login``` and ```api/v1/users/register - will generate a JWT and send it back to the client. tokens are valid for 1 h
 * When a user logs in, if the authenticate method returns the user, the userId is added to the request so that each following middleware function has access to it
 
 ### Tests
-* Mocha and chai used to test the following user stories: 
-    * ```/api/v1/users GET``` If a user is logged in it should respond with a 200 and users in the DB
-    * ```/api/v1/users GET``` should respond with a 401 if a request is made with invalid credentials
-    * ```/api/v1/courses/:courseId PUT``` should respond with a 401 if a user tries to update a course with invalid credentials
+* I used supertest and jest for testing, all tests can be found in the ```tests``` directory
+* A local test database is used
 
 ### Packages Used
 * mongoose
@@ -93,11 +91,8 @@ This is the back-end for a course rating service, built with Node, Express, and 
 * express-validator
 * validator
 * jsonwebtoken
-* passport
-* passport-jwt
-* mocha
-* chai
-* chai-http
+* supertest
+* jest
 
 ## Author
 Frank Rosendorf
