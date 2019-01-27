@@ -5,12 +5,12 @@ describe('errorHandlers', () => {
 
   describe('notFound', () => {
     let server;
-    beforeAll(() => {
+    beforeEach(() => {
       server = require('../src/index')
     })
   
-    afterAll(() => {
-      server.close()
+    afterEach(async () => {
+      await server.close()
     }) 
 
     it('should return a 404 and a message for an unhandled route', async () => {

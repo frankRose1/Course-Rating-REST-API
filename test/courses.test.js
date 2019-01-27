@@ -14,6 +14,7 @@ const testUser = {
 const testCourse1 = {
   title: 'First Test Course',
   user: testUser._id,
+  _id: Types.ObjectId(),
   description: 'The is the first course to be testing the the application!',
   estimatedTime: '2 hours',
   materialsNeeded: 'Code editor, testing documentation',
@@ -66,8 +67,8 @@ describe('/api/v1/courses', () => {
   let token;
 
   beforeEach(() => {
-    token = new User().generateAuthToken()
     server = require('../src/index');
+    token = new User().generateAuthToken()
   });
 
   afterEach(async () => {
@@ -75,7 +76,7 @@ describe('/api/v1/courses', () => {
       Course.collection.deleteMany({}),
       User.collection.deleteMany({})
     ]);
-    server.close();
+    await server.close();
   });
 
   describe('GET /', () => {
@@ -86,7 +87,7 @@ describe('/api/v1/courses', () => {
       ]);
       const res = await request(server).get('/api/v1/courses');
       expect(res.status).toBe(200);
-      expect(res.body.length).toBe(2);
+      expect(res.body).toHaveLength(2);
       expect(res.body.some(c => c.title === testCourse1.title)).toBeTruthy();
       expect(res.body.some(c => c.title === testCourse2.title)).toBeTruthy();
     });
@@ -98,17 +99,28 @@ describe('/api/v1/courses', () => {
         .post('/api/v1/courses')
         .set('Authorization', token)
         .send(testCourse1);
-        console.log(res.headers)
       expect(res.status).toBe(201)
+      expect(res.headers.location).toBe(`/api/v1/courses/${testCourse1._id}`)
     })
 
-    it('should return a 422 for a course with invalid fields', async () => {
+    it('should return a 401 for an unauthenticated user', async () => {
+      token = '';
+      const res = await request(server)
+        .post('/api/v1/courses')
+        .send(testCourse1)
+        .set('Authorization', token);
+      expect(res.status).toBe(401)
+    })
+
+    it('should return a 422 and error messages for a course with invalid fields', async () => {
       const res = await request(server)
         .post('/api/v1/courses')
         .set('Authorization', token)
         .send(invalidCourse);
-      console.log(res.body)
       expect(res.status).toBe(422);
+      expect(res.body.errors).toContain('Please provide a course title at least 5 characters long.')
+      expect(res.body.errors).toContain('Please provide a course description at least 10 characters long.')
+      expect(res.body.errors).toContain('Please provide an estimated time of course completion.')
     })
   })
 

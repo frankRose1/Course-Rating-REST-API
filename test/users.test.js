@@ -1,6 +1,5 @@
 const User = require('../src/models/userModel');
 const request = require('supertest');
-let server;
 
 const testUser1 = {
   fullName: 'John Doe',
@@ -25,14 +24,16 @@ const invalidUser = {
   confirmPassword: 'lol'
 };
 
-xdescribe('/api/v1/users', () => {
+describe('/api/v1/users', () => {
+  let server;
+  
   beforeEach(() => {
     server = require('../src/index');
   });
 
   afterEach(async () => {
     await User.collection.deleteMany({});
-    server.close();
+    await server.close();
   });
 
   describe('GET /', () => {

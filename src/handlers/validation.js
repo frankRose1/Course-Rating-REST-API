@@ -51,7 +51,6 @@ validator.createRegisterValidation = [
 validator.createCourseValidation = [
   body('title', 'Please provide a course title at least 5 characters long.')
     .trim()
-    .isString()
     .isLength({ min: 5 }),
   body(
     'description',
