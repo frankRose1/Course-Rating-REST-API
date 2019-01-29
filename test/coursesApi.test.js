@@ -60,22 +60,19 @@ const invalidCourse = {
         'GraphQL is a query language that makes querying much cleaner and faster...'
     }
   ]
-}
+};
 
-describe('/api/v1/courses', () => {
+xdescribe('/api/v1/courses', () => {
   let server;
   let token;
 
   beforeEach(() => {
     server = require('../src/index');
-    token = new User().generateAuthToken()
+    token = new User().generateAuthToken();
   });
 
   afterEach(async () => {
-    await Promise.all([
-      Course.collection.deleteMany({}),
-      User.collection.deleteMany({})
-    ]);
+    await Promise.all([Course.deleteMany({}), User.deleteMany({})]);
     await server.close();
   });
 
@@ -99,9 +96,9 @@ describe('/api/v1/courses', () => {
         .post('/api/v1/courses')
         .set('Authorization', token)
         .send(testCourse1);
-      expect(res.status).toBe(201)
-      expect(res.headers.location).toBe(`/api/v1/courses/${testCourse1._id}`)
-    })
+      expect(res.status).toBe(201);
+      expect(res.headers.location).toBe(`/api/v1/courses/${testCourse1._id}`);
+    });
 
     it('should return a 401 for an unauthenticated user', async () => {
       token = '';
@@ -109,8 +106,8 @@ describe('/api/v1/courses', () => {
         .post('/api/v1/courses')
         .send(testCourse1)
         .set('Authorization', token);
-      expect(res.status).toBe(401)
-    })
+      expect(res.status).toBe(401);
+    });
 
     it('should return a 422 and error messages for a course with invalid fields', async () => {
       const res = await request(server)
@@ -118,11 +115,17 @@ describe('/api/v1/courses', () => {
         .set('Authorization', token)
         .send(invalidCourse);
       expect(res.status).toBe(422);
-      expect(res.body.errors).toContain('Please provide a course title at least 5 characters long.')
-      expect(res.body.errors).toContain('Please provide a course description at least 10 characters long.')
-      expect(res.body.errors).toContain('Please provide an estimated time of course completion.')
-    })
-  })
+      expect(res.body.errors).toContain(
+        'Please provide a course title at least 5 characters long.'
+      );
+      expect(res.body.errors).toContain(
+        'Please provide a course description at least 10 characters long.'
+      );
+      expect(res.body.errors).toContain(
+        'Please provide an estimated time of course completion.'
+      );
+    });
+  });
 
   describe('GET /:courseId', () => {
     it('should return a course for a valid ID', async () => {
@@ -144,6 +147,4 @@ describe('/api/v1/courses', () => {
       expect(res.body.message).toBe('Could not find a course with that ID.');
     });
   });
-
-  
 });

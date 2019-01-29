@@ -52,15 +52,15 @@ router.put(
 router.post(
   '/courses/:courseId/reviews',
   authenticate,
+  checkOwner,
   createReviewValidation,
   validateInputs,
-  checkOwner,
   courseController.createReview
 );
 
 //auth routes
 router.post(
-  '/login',
+  '/auth',
   createLoginValidation,
   validateInputs,
   authController.login

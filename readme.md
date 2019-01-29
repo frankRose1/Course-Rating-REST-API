@@ -74,7 +74,7 @@ This is the back-end for a course rating service, built with Node, Express, and 
 ### Auth
 * Json web token should be sent as in the Authorization headers for protected routes:
     ```"Authorization": "yourJWThere"```
-* ```/api/v1/login``` and ```api/v1/users/register - will generate a JWT and send it back to the client. tokens are valid for 1 h
+* ```/api/v1/auth``` and ```api/v1/users/register - will generate a JWT and send it back to the client. tokens are valid for 1 h
 * When a user logs in, if the authenticate method returns the user, the userId is added to the request so that each following middleware function has access to it
 
 ### Tests

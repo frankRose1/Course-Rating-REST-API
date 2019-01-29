@@ -24,15 +24,15 @@ const invalidUser = {
   confirmPassword: 'lol'
 };
 
-describe('/api/v1/users', () => {
+xdescribe('/api/v1/users', () => {
   let server;
-  
+
   beforeEach(() => {
     server = require('../src/index');
   });
 
   afterEach(async () => {
-    await User.collection.deleteMany({});
+    await User.deleteMany({});
     await server.close();
   });
 

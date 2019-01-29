@@ -45,9 +45,7 @@ courseController.createCourse = (req, res, next) => {
   course
     .save()
     .then(course => {
-      res
-        .location(`/api/v1/courses/${course._id}`)
-        .sendStatus(201);
+      res.location(`/api/v1/courses/${course._id}`).sendStatus(201);
     })
     .catch(err => {
       next(err);
@@ -118,7 +116,6 @@ courseController.createReview = (req, res, next) => {
       res.location(`/api/v1/courses/${course._id}`).sendStatus(201);
     })
     .catch(err => {
-      //use the validation on the model
       if (err.name === 'ValidationError') {
         const error = new Error(
           'Please leave a number rating between 1 and 5.'
