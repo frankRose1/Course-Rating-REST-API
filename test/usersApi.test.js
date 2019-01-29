@@ -24,7 +24,7 @@ const invalidUser = {
   confirmPassword: 'lol'
 };
 
-xdescribe('/api/v1/users', () => {
+describe('/api/v1/users', () => {
   let server;
 
   beforeEach(() => {

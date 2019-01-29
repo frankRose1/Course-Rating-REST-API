@@ -62,7 +62,7 @@ const invalidCourse = {
   ]
 };
 
-xdescribe('/api/v1/courses', () => {
+describe('/api/v1/courses', () => {
   let server;
   let token;
 

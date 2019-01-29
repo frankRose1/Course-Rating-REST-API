@@ -4,7 +4,7 @@ const userController = require('../controllers/userController');
 const courseController = require('../controllers/courseController');
 const authController = require('../controllers/authController');
 const checkOwner = require('../middleware/checkCourseOwner');
-const authenticate = require('../middleware/auth');
+const auth = require('../middleware/auth');
 const {
   createRegisterValidation,
   createLoginValidation,
@@ -16,18 +16,18 @@ const {
 //all routes are prepended with "/api/v1"
 
 //user routes
-router.get('/users', authenticate, userController.getUsers);
+router.get('/users', auth, userController.getUsers);
 router.post(
   '/users',
   createRegisterValidation,
   validateInputs,
   userController.createUser
 );
-router.get('/users/profile', authenticate, userController.userProfile);
-router.get('/users/interests', authenticate, userController.getUsersByInterest);
+router.get('/users/profile', auth, userController.userProfile);
+router.get('/users/interests', auth, userController.getUsersByInterest);
 router.get(
   '/users/interests/:interest',
-  authenticate,
+  auth,
   userController.getUsersByInterest
 );
 
@@ -37,21 +37,21 @@ router.get('/courses/top-rated', courseController.getTopRated);
 router.get('/courses/:courseId', courseController.getCourseById);
 router.post(
   '/courses',
-  authenticate,
+  auth,
   createCourseValidation,
   validateInputs,
   courseController.createCourse
 );
 router.put(
   '/courses/:courseId',
-  authenticate,
+  auth,
   createCourseValidation,
   validateInputs,
   courseController.updateCourse
 );
 router.post(
   '/courses/:courseId/reviews',
-  authenticate,
+  auth,
   checkOwner,
   createReviewValidation,
   validateInputs,

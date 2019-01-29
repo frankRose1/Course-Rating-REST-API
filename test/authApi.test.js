@@ -1,7 +1,7 @@
 const request = require('supertest')
 const User = require('../src/models/userModel');
 
-xdescribe('/api/v1/auth', () => {
+describe('/api/v1/auth', () => {
   let server;
   let authPayload;
   let user;

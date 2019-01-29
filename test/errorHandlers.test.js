@@ -1,7 +1,7 @@
 const request = require('supertest');
 const { globalErrorHandler } = require('../src/handlers/errorHandlers');
 
-xdescribe('errorHandlers', () => {
+describe('errorHandlers', () => {
   describe('notFound', () => {
     let server;
     beforeEach(() => {

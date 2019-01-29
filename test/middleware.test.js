@@ -2,11 +2,11 @@ const authenticate = require('../src/middleware/auth');
 const { Types } = require('mongoose');
 const User = require('../src/models/userModel');
 
-xdescribe('middleware', () => {
+describe('middleware', () => {
   afterEach(() => {
     delete process.env.APP_SECRET;
   });
-  describe('authenticate', () => {
+  describe('auth', () => {
     process.env.APP_SECRET = 'testing auth;';
     it('should populate req.user with the decoded token', async () => {
       const user = {

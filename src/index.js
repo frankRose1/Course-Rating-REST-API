@@ -1,12 +1,9 @@
-'use strict';
-
 require('dotenv').config({ path: '.env' });
 const express = require('express');
-const morgan = require('morgan');
 const bodyParser = require('body-parser');
+const helmet = require('helmet')
 const errorHandlers = require('./handlers/errorHandlers');
 const port = process.env.PORT || 5000;
-//import models before the router
 require('./models/userModel');
 require('./models/reviewModel');
 require('./models/courseModel');
@@ -26,7 +23,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// app.use(morgan('dev'));
+app.use(helmet())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -36,11 +33,6 @@ app.get('/', (req, res) => {
     instructions:
       'Check out the readme.md for a guide! https://github.com/frankRose1/Course-Rating-REST-API/blob/master/readme.md'
   });
-});
-
-// to test the global error handler
-app.get('/error', (req, res) => {
-  throw new Error('Test error');
 });
 
 //routes

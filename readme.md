@@ -87,7 +87,7 @@ This is the back-end for a course rating service, built with Node, Express, and 
 * bcryptjs
 * body-parser
 * dotenv
-* morgan
+* helmet
 * express-validator
 * validator
 * jsonwebtoken

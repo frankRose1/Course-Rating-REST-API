@@ -114,15 +114,17 @@ CourseSchema.statics.getTopRated = function() {
 //Auto populate the reviews and course owner each time a query is made for a specific course
 //Use deep population to return only the users fullname, avatar(if they have one), and ID on the related course and on the individual reviews
 function autoPopulate(next) {
-  this.populate('user', 'fullName avatar').populate({
-    path: 'reviews',
-    model: 'Review',
-    populate: {
-      path: 'user',
-      model: 'User',
-      select: 'fullName avatar'
-    }
-  });
+  this
+    .populate('user', 'fullName avatar')
+    .populate({
+      path: 'reviews',
+      model: 'Review',
+      populate: {
+        path: 'user',
+        model: 'User',
+        select: 'fullName avatar'
+      }
+    });
 
   next();
 }
