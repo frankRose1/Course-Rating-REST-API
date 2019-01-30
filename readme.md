@@ -9,7 +9,7 @@ This is the back-end for a course rating service, built with Node, Express, and 
 ## App Features
 ### Users
 * ```GET /api/v1/users 200``` - Returns a list of users in the DB
-* ```POST /api/v1/users/register 201``` - Creates a user, sends jwt to client
+* ```POST /api/v1/users 201``` - Creates a user, sends jwt to client
     * "interests" are optional:
     ```javascript
         {
@@ -74,12 +74,16 @@ This is the back-end for a course rating service, built with Node, Express, and 
 ### Auth
 * Json web token should be sent as in the Authorization headers for protected routes:
     ```"Authorization": "yourJWThere"```
-* ```/api/v1/auth``` and ```api/v1/users/register - will generate a JWT and send it back to the client. tokens are valid for 1 h
-* When a user logs in, if the authenticate method returns the user, the userId is added to the request so that each following middleware function has access to it
+* Getting a token:
+    * new users should use ```POST api/v1/users```
+    * returning users should use ```POST /api/v1/auth``` with their credentials (email and password)
+    * tokens are valid for 1 hour
+* If a user is authenticated, the userId is added to the request so that each following middleware function has access to it
 
 ### Tests
-* I used supertest and jest for testing, all tests can be found in the ```tests``` directory
+* I used supertest and jest for testing, all tests can be found in the ```test``` directory
 * A local test database is used
+* To runtests you will need a MongoDB server running locally, then in a separate terminal enter ```npm run test```
 
 ### Packages Used
 * mongoose
