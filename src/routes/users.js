@@ -3,13 +3,14 @@ const router = express.Router();
 const gravatar = require('gravatar');
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
+const { auth } = require('../middleware');
 const {
   createRegisterValidation,
   validateInputs
 } = require('../handlers/validation');
 
 // GET /api/users 200 - Returns info about the users in the DB
-router.get('/', (req, res, next) => {
+router.get('/', auth, (req, res, next) => {
   User.find({})
     .select('-_id fullName interests avatar')
     .then(users => {
@@ -21,7 +22,7 @@ router.get('/', (req, res, next) => {
 });
 
 // POST /api/users 201 - Creates a user, sets the Location header to "/", and returns a token
-router.post('/', (req, res, next) => {
+router.post('/', createRegisterValidation, validateInputs, (req, res, next) => {
   const avatar = gravatar.url(req.body.emailAddress, {
     r: 'pg', //Rating,
     s: '200', //Size
@@ -48,7 +49,7 @@ router.post('/', (req, res, next) => {
 });
 
 // GET 200 --> if a user has their token signed in, req.user will have the ID
-router.get('/profile', (req, res, next) => {
+router.get('/profile', auth, (req, res, next) => {
   const { id } = req.user;
   User.findById(id)
     .select('-_id fullName interests avatar')
@@ -65,7 +66,7 @@ router.get('/profile', (req, res, next) => {
 
 //GET api/v1/users/interests && api/v1/users/interests/:interest
 //aggregate the interests and if there is a param, find users with that interest
-router.get('/interests/:interest', (req, res, next) => {
+router.get('/interests/:interest', auth, (req, res, next) => {
   const { interest } = req.params;
   const query = interest || { $exists: true }; //fallback to any user with any interest
   const intPromise = User.getInterestsList();
