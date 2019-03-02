@@ -1,13 +1,12 @@
 require('dotenv').config({ path: '.env' });
 const express = require('express');
+require('express-async-errors');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
-const errorHandlers = require('./handlers/errorHandlers');
 const port = process.env.PORT || 5000;
 require('./models/userModel');
 require('./models/reviewModel');
 require('./models/courseModel');
-const router = require('./routes');
 
 const app = express();
 app.set('port', port);
@@ -36,14 +35,7 @@ app.get('/', (req, res) => {
 });
 
 //routes
-app.use('/api/v1', router);
-// require('./routes')(app)
-
-// send 404 if no other route matched
-app.use(errorHandlers.notFound);
-
-// global error handler
-app.use(errorHandlers.globalErrorHandler);
+require('./routes')(app);
 
 require('./db')();
 const server = app.listen(app.get('port'), () => {

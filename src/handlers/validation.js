@@ -13,10 +13,10 @@ validator.createLoginValidation = [
   body('emailAddress')
     .isEmail()
     .withMessage('Please provide a properly formatted email address.'),
-  body('password', 'Plese provide your password.')
+  body('password')
     .not()
     .isEmpty()
-    .isLength({ min: 8 })
+    .withMessage('Please provide your password.')
 ];
 
 validator.createRegisterValidation = [

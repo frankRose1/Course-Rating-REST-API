@@ -22,24 +22,6 @@ router.get('/', (req, res, next) => {
     });
 });
 
-//GET /api/course/:courseId 200 - Returns all Course properties and related documents for the provided course ID
-router.get('/:id', isValidID, (req, res, next) => {
-  const { id } = req.params;
-  Course.findById(id)
-    .then(course => {
-      if (!course) {
-        const error = new Error('Could not find a course with that ID.');
-        error.status = 404;
-        throw error;
-      }
-
-      res.status(200).json(course);
-    })
-    .catch(err => {
-      next(err);
-    });
-});
-
 //POST /api/courses 201 - Creates a course, sets the Location header, created status code and returns the course
 //Required --> title, description, auth headers
 router.post(
@@ -63,6 +45,38 @@ router.post(
       });
   }
 );
+
+//GET /api/v1/courses/top-rated
+router.get('/top-rated', (req, res, next) => {
+  Course.getTopRated()
+    .then(courses => {
+      res.json({
+        message: `Top ${courses.length} courses!`,
+        courses
+      });
+    })
+    .catch(err => {
+      next(err);
+    });
+});
+
+//GET /api/course/:courseId 200 - Returns all Course properties and related documents for the provided course ID
+router.get('/:id', isValidID, (req, res, next) => {
+  const { id } = req.params;
+  Course.findById(id)
+    .then(course => {
+      if (!course) {
+        const error = new Error('Could not find a course with that ID.');
+        error.status = 404;
+        throw error;
+      }
+
+      res.status(200).json(course);
+    })
+    .catch(err => {
+      next(err);
+    });
+});
 
 // PUT /api/courses/:id 204 - Updates a course and returns no content, set location headers to the course
 router.put(
@@ -155,19 +169,5 @@ router.post(
       });
   }
 );
-
-//GET /api/v1/courses/top-rated
-router.get('/top-rated', (req, res, next) => {
-  Course.getTopRated()
-    .then(courses => {
-      res.json({
-        message: `Top ${courses.length} courses!`,
-        courses
-      });
-    })
-    .catch(err => {
-      next(err);
-    });
-});
 
 module.exports = router;

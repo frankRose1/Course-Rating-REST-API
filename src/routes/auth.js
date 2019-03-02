@@ -7,27 +7,24 @@ const {
   createLoginValidation,
   validateInputs
 } = require('../handlers/validation');
+const INVALID_CREDENTIALS = 'Invalid email or password';
 
-router.post('/', createLoginValidation, validateInputs, (req, res, next) => {
+router.post('/', createLoginValidation, validateInputs, async (req, res) => {
   const { emailAddress, password } = req.body;
-  User.findOne({ emailAddress: emailAddress })
-    .then(user => {
-      if (!user) {
-        return res.status(400).json({ message: 'Invalid email or password' });
-      }
+  const user = await User.findOne({ emailAddress: emailAddress });
 
-      bcrypt.compare(password, user.password, (err, isValid) => {
-        if (isValid) {
-          const token = user.generateAuthToken();
-          return res.json({ token });
-        } else {
-          return res.status(400).json({ message: 'Invalid email or password' });
-        }
-      });
-    })
-    .catch(err => {
-      next(err);
-    });
+  if (!user) {
+    return res.status(400).json({ message: INVALID_CREDENTIALS });
+  }
+
+  const isValid = await bcrypt.compare(password, user.password);
+
+  if (!isValid) {
+    return res.status(400).json({ message: INVALID_CREDENTIALS });
+  }
+
+  const token = user.generateAuthToken();
+  return res.json({ token });
 });
 
 module.exports = router;
