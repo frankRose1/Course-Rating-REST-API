@@ -83,7 +83,7 @@ courseController.updateCourse = (req, res, next) => {
     });
 };
 
-//POST /api/courses/:courseId/reviews 201 - Creates a review for the specified course ID,
+//POST /api/courses/:id/reviews 201 - Creates a review for the specified course ID,
 //sets the Location header to the related course, and returns no content
 // Required --> auth and rating
 courseController.createReview = (req, res, next) => {
@@ -104,7 +104,7 @@ courseController.createReview = (req, res, next) => {
     .then(review => {
       savedReviewId = review._id;
       //find the course and update the reviews
-      return Course.findById(req.params.courseId).select('reviews');
+      return Course.findById(req.params.id).select('reviews');
     })
     .then(course => {
       const reviews = course.reviews.slice();

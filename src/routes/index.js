@@ -5,6 +5,7 @@ const courseController = require('../controllers/courseController');
 const authController = require('../controllers/authController');
 const checkOwner = require('../middleware/checkCourseOwner');
 const auth = require('../middleware/auth');
+const isValidID = require('../middleware/isValidID');
 const {
   createRegisterValidation,
   createLoginValidation,
@@ -50,9 +51,10 @@ router.put(
   courseController.updateCourse
 );
 router.post(
-  '/courses/:courseId/reviews',
+  '/courses/:id/reviews',
   auth,
   checkOwner,
+  isValidID,
   createReviewValidation,
   validateInputs,
   courseController.createReview
