@@ -144,7 +144,7 @@ describe('/api/v1/courses', () => {
       const nonExistingId = Types.ObjectId();
       const res = await request(server).get(`/api/v1/courses/${nonExistingId}`);
       expect(res.status).toBe(404);
-      expect(res.body.message).toBe('Could not find a course with that ID.');
+      expect(res.body.message).toBe('Course not found.');
     });
   });
 });

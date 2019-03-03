@@ -70,6 +70,19 @@ validator.createReviewValidation = [
   body('rating', 'Please leave a rating between 1 and 5.')
     .not()
     .isEmpty()
+    .custom((value, { req }) => {
+      if (Number.isNaN(parseInt(value))) {
+        throw new Error('Rating must be a number.');
+      }
+      return true;
+    })
+    .custom((value, { req }) => {
+      const result = parseInt(value) < 1 || parseInt(value) > 5;
+      if (result) {
+        throw new Error('Rating must be a number between 1 and 5.');
+      }
+      return true;
+    })
 ];
 
 validator.validateInputs = (req, res, next) => {
