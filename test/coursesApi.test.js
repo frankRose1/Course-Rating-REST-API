@@ -134,10 +134,10 @@ describe('/api/v1/courses', () => {
       await Promise.all([course.save(), user.save()]);
       const res = await request(server).get(`/api/v1/courses/${course._id}`);
       expect(res.status).toBe(200);
-      expect(res.body._id).toBe(course._id.toHexString());
-      expect(res.body.user._id).toBe(user._id.toHexString());
-      expect(res.body.estimatedTime).toBe(course.estimatedTime);
-      expect(res.body.title).toBe(course.title);
+      expect(res.body.course._id).toBe(course._id.toHexString());
+      expect(res.body.course.user.fullName).toBe(user.fullName);
+      expect(res.body.course.estimatedTime).toBe(course.estimatedTime);
+      expect(res.body.course.title).toBe(course.title);
     });
 
     it("should return a 404 for a course that doesn't exist", async () => {

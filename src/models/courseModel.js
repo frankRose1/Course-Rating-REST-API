@@ -85,8 +85,8 @@ CourseSchema.statics.getTopRated = function() {
     {
       $lookup: {
         from: 'reviews',
-        localField: 'reviews',
-        foreignField: '_id',
+        localField: '_id',
+        foreignField: 'course',
         as: 'topReviews'
       }
     },

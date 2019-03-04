@@ -26,7 +26,8 @@ describe('/api/v1/courses/:courseId/reviews', () => {
     token = user.generateAuthToken();
     review = {
       rating: 5,
-      review: 'A great course!!'
+      review: 'A great course!!',
+      _id: Types.ObjectId()
     };
     course = new Course({
       title: 'First Test Course',
@@ -96,7 +97,7 @@ describe('/api/v1/courses/:courseId/reviews', () => {
       );
     });
 
-    it('returns a 201 for a valid review and sets location headers to the reviewed course', async () => {
+    it('returns a 201 for a valid review and sets location headers to the newly reviewed course', async () => {
       token = newToken
       const res = await exec()
       expect(res.status).toBe(201);
@@ -106,11 +107,10 @@ describe('/api/v1/courses/:courseId/reviews', () => {
     it('saves the review to the correct course in the database', async () => {
       token = newToken
       await exec();
-      const reviewedCourse = await Course.findById(courseId);
-      expect(reviewedCourse._id).toEqual(courseId)
-      expect(reviewedCourse.reviews).toHaveLength(1)
-      expect(reviewedCourse.reviews[0].rating).toBe(review.rating)
-      expect(reviewedCourse.reviews[0].review).toBe(review.review)
+      const newReview = await Review.findById(review._id);
+      expect(newReview.course).toEqual(courseId)
+      expect(newReview.rating).toBe(review.rating)
+      expect(newReview.review).toBe(review.review)
     })
   });
 });

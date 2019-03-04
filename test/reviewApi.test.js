@@ -23,7 +23,8 @@ describe('/api/v1/reviews', () => {
     token = user.generateAuthToken();
     review = new Review({
       rating: 3,
-      user: user._id
+      user: user._id,
+      course: Types.ObjectId()
     });
     reviewId = review._id;
     await Promise.all([user.save(), review.save()]);
