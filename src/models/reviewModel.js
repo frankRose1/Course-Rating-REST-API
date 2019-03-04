@@ -5,7 +5,12 @@ const ReviewSchema = new Schema({
   user: {
     type: mongoose.Schema.ObjectId,
     ref: 'User',
-    required: [true, 'A logged in user is needed to post a review!']
+    required: [true, 'A logged in user is needed to post a review.']
+  },
+  course: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Course',
+    required: [true, 'A review must belong to a specific course.']
   },
   postedOn: {
     type: Date,

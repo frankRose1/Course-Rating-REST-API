@@ -10,10 +10,9 @@ const {
 const REVIEW_NOT_FOUND = 'Review not found.';
 
 router.get('/:id', isValidID, async (req, res) => {
-  const review = await Review.findById(req.params.id).populate(
-    'user',
-    '-_id fullName avatar'
-  );
+  const review = await Review.findById(req.params.id)
+  .populate('user', '-_id fullName avatar')
+  .populate('course', 'title estimatedTime');
   if (!review) {
     return res.status(404).json({ message: REVIEW_NOT_FOUND });
   }

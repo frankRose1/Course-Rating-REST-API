@@ -44,15 +44,21 @@ router.get('/top-rated', async (req, res) => {
   });
 });
 
-//GET /api/course/:courseId 200 - Returns all Course properties and related documents for the provided course ID
+//GET /api/course/:courseId 200 - Returns a course and related reviews
 router.get('/:id', isValidID, async (req, res) => {
   const { id } = req.params;
-  const course = await Course.findById(id);
+  const coursePromise = Course.findById(id).populate('user', '-_id fullName avatar');
+  const reviewsPromise = Review.find({course: id})
+    .select('rating review user postedOn')
+    .populate('user', '-_id fullName avatar')
+    .sort({postedOn: -1});
+  const [course, reviews] = await Promise.all([coursePromise, reviewsPromise]);
+
   if (!course) {
     return res.status(404).json({ message: COURSE_NOT_FOUND });
   }
 
-  res.status(200).json(course);
+  res.status(200).json({course, reviews});
 });
 
 // PUT /api/courses/:id 204 - Updates a course and returns no content, set location headers to the course
@@ -70,7 +76,8 @@ router.put(
       return res.status(404).json({ message: COURSE_NOT_FOUND });
     }
 
-    if (!course.user._id.equals(userId)) {
+    const hasPermission = course.hasUpdatePermission(userId)
+    if (!hasPermission) {
       return res.status(403).json({
         message: 'Only the owner of this course can make updates.'
       });
@@ -92,19 +99,21 @@ router.post(
   createReviewValidation,
   validateInputs,
   async (req, res) => {
+    const userId = req.user.id;
+    const courseId = req.params.id
     const reviewData = {
       ...req.body,
-      user: req.user.id
+      user: userId,
+      course: courseId
     };
 
-    const course = await Course.findById(req.params.id).select('reviews');
+    const course = await Course.findById(courseId);
     if (!course) {
       return res.status(404).json({ message: COURSE_NOT_FOUND });
     }
 
-    const existingReview = course.reviews.find(
-      rev => rev.user._id.toString() === req.user.id
-    );
+    const existingReview = await Review.findOne({course: courseId, user: userId});
+
     if (existingReview) {
       return res
         .status(400)
@@ -114,12 +123,6 @@ router.post(
 
     const review = new Review(reviewData);
     await review.save();
-
-    //update the course reviews
-    const reviews = course.reviews.slice();
-    reviews.unshift(review._id);
-    course.set({ reviews });
-    await course.save();
 
     res.location(`/api/v1/courses/${course._id}`).sendStatus(201);
   }

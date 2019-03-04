@@ -40,14 +40,15 @@ const CourseSchema = new Schema({
         trim: true
       }
     }
-  ],
-  reviews: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: 'Review'
-    }
   ]
 });
+
+/**
+ * Verifies that the user attemting to update the course is the user who created it
+ */
+CourseSchema.methods.hasUpdatePermission = function(userId) {
+  return this.user.toString() === userId;
+};
 
 /**
  * Used in middleware to prevent a course owner from reviewing their own course
@@ -110,25 +111,5 @@ CourseSchema.statics.getTopRated = function() {
     { $limit: 10 }
   ]);
 };
-
-//Auto populate the reviews and course owner each time a query is made for a specific course
-//Use deep population to return only the users fullname, avatar(if they have one), and ID on the related course and on the individual reviews
-function autoPopulate(next) {
-  this
-    .populate('user', 'fullName avatar')
-    .populate({
-      path: 'reviews',
-      model: 'Review',
-      populate: {
-        path: 'user',
-        model: 'User',
-        select: 'fullName avatar'
-      }
-    });
-
-  next();
-}
-
-CourseSchema.pre('findOne', autoPopulate);
 
 module.exports = mongoose.model('Course', CourseSchema);

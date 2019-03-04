@@ -1,11 +1,11 @@
 require('dotenv').config({ path: '.env' });
 const express = require('express');
 const mongoose = require('mongoose');
-require('express-async-errors');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const port = process.env.PORT || 5000;
 
+require('express-async-errors');
 mongoose.set('useCreateIndex', true);
 require('./models/userModel');
 require('./models/reviewModel');
