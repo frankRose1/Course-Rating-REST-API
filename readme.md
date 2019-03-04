@@ -62,6 +62,10 @@ This is the back-end for a course rating service, built with Node, Express, and 
     ```
 * ```POST /api/v1/courses/:courseId/reviews 201``` - Creates a review for the specified course ID, sets the Location header to the related course, and returns no content
 
+### Reviews
+* ```GET /api/v1/reviews/:reviewId 200``` - Returns the individual review and the author of the review
+* ```PUT /api/v1/reviews/:reviewId 204```- Will allow a user to update a review if they are the one that created it. Sets location headers to the review.
+
 ### Models
 * User model has a pre-save hook that uses ```bcryptjs``` to hash the user's password
 * User and Course models have aggregations

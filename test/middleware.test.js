@@ -1,4 +1,4 @@
-const authenticate = require('../src/middleware/auth');
+const auth = require('../src/middleware/auth');
 const { Types } = require('mongoose');
 const User = require('../src/models/userModel');
 
@@ -19,7 +19,7 @@ describe('middleware', () => {
         header: jest.fn().mockReturnValue(token)
       };
       const next = jest.fn();
-      authenticate(req, res, next);
+      auth(req, res, next);
       expect(req.user.id).toBe(user._id);
     });
   });

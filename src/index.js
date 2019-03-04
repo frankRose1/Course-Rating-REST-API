@@ -1,9 +1,12 @@
 require('dotenv').config({ path: '.env' });
 const express = require('express');
+const mongoose = require('mongoose');
 require('express-async-errors');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const port = process.env.PORT || 5000;
+
+mongoose.set('useCreateIndex', true);
 require('./models/userModel');
 require('./models/reviewModel');
 require('./models/courseModel');
@@ -16,7 +19,7 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader(
     'Access-Control-Allow-Methods',
-    'OPTIONS, GET, PUT, POST, PATCH, DELETE'
+    'OPTIONS, GET, PUT, POST, DELETE'
   );
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
